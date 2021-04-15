@@ -11,8 +11,8 @@ new Vue({
 
 /**
  * Todo List
- * read
- * create
- * delete
+ * [x] read 
+ * [x] create
+ * [x] delete
  * update
  */

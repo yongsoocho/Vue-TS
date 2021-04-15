@@ -13,7 +13,14 @@
 					   ></TodoInput>
 			<div>
 				<v-list>
-					<TodoListItem></TodoListItem>
+					<TodoListItem 
+								  v-for="(todoItem, index) in todoItems" 
+								  :key="index"
+								  :index="index"
+								  :todoItem="todoItem"
+								  @remove="removeTodoItem"
+								  @toggle="toggleTodoItemComplete"
+								  ></TodoListItem>
 				</v-list>
 			</div>
 		</v-col>
@@ -30,15 +37,20 @@ import TodoListItem from "./components/TodoListItem.vue";
 const STORAGE_KEY = 'vue-todo-items';
 	
 const storage = {
-	fetch() {
-		const todoItems: string = localStorage.getItem(STORAGE_KEY) || "[]";
-		const result: any[] = JSON.parse(todoItems);
+	fetch(): Todo[] {
+		const todoItems = localStorage.getItem(STORAGE_KEY) || "[]";
+		const result = JSON.parse(todoItems);
 		return result;
 	},
-	save(value: any[]) {
+	save(value: Todo[]) {
 		const parsed = JSON.stringify(value);
 		localStorage.setItem(STORAGE_KEY, parsed);
 	}
+}
+
+export interface Todo {
+	title: string;
+	done: boolean;
 }
 	
 export default Vue.extend({
@@ -49,7 +61,7 @@ export default Vue.extend({
 	data() {
 		return {
 			todoText: "",
-			todoItems: []
+			todoItems: [] as Todo[]	// In Vue.js type define when initailize
 		}
 	},
 	methods: {
@@ -57,8 +69,11 @@ export default Vue.extend({
 			this.todoText = value;
 		},
 		addTodoItem() {
-			const value = this.todoText;
-			this.todoItems.push(value);
+			const todo: Todo = {
+				title: this.todoText,
+				done: false
+			};
+			this.todoItems.push(todo);
 			storage.save(this.todoItems);
 			// localStorage.setItem(value, value);
 			return this.initTodoText();
@@ -67,7 +82,26 @@ export default Vue.extend({
 			return this.todoText = "";
 		},
 		fetchTodoItems() {
-			this.todoItems = storage.fetch();
+			this.todoItems = storage.fetch().sort((a: Todo, b: Todo) => {
+				if(a.title < b.title) { 
+					return -1;
+				}
+				if(a.title > b.title) { 
+					return 1 
+				};
+				return 0;
+			});
+		},
+		removeTodoItem(index: number) {
+			this.todoItems.splice(index, 1);
+			return storage.save(this.todoItems);
+		},
+		toggleTodoItemComplete(todoItem: Todo, index: number) {
+			this.todoItems.splice(index, 1, {
+				...todoItem,
+				done: !todoItem.done
+			});
+			return storage.save(this.todoItems);
 		}
 	},
 	created() {
