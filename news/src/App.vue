@@ -15,7 +15,6 @@ import Spinner from "./components/Spinner.vue";
 import bus from "./utils/bus";
 import { MutationTypes } from "./store/mutations";
 import { ActionTypes } from "./store/actions";
-
 export default Vue.extend({
   components: {
     ToolBar,
@@ -50,7 +49,6 @@ export default Vue.extend({
 body {
   margin: 0;
 }
-
 a {
   color: #34495e;
   text-decoration: none;
@@ -62,7 +60,6 @@ a:hover {
 a.router-link-active {
   text-decoration: underline;
 }
-
 /* Router Transition */
 .routing-fade-enter-active,
 .routing-fade-leave-active {
